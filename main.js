@@ -31,22 +31,26 @@ export class Trigger {
   };
 
   triggers = async (data, triggerConfig) => {
-    let files = (
-      await this.api.listDirectory(this.config.pwd, data.path)
-    ).directory.map((v) => v.name);
-    if (!this.filesInFolder[triggerConfig.id]) {
+    try {
+      let files = (
+        await this.api.listDirectory(this.config.pwd, data.path)
+      ).directory.map((v) => v.name);
+      if (!this.filesInFolder[triggerConfig.id]) {
+        this.filesInFolder[triggerConfig.id] = files;
+        return false;
+      }
+
+      for (let file of files) {
+        if (!this.filesInFolder[triggerConfig.id].includes(file)) {
+          this.filesInFolder[triggerConfig.id] = files;
+          return true;
+        }
+      }
+
       this.filesInFolder[triggerConfig.id] = files;
+    } catch {
       return false;
     }
-
-    for (let file of files) {
-      if (!this.filesInFolder[triggerConfig.id].includes(file)) {
-        this.filesInFolder[triggerConfig.id] = files;
-        return true;
-      }
-    }
-
-    this.filesInFolder[triggerConfig.id] = files;
 
     return false;
   };
