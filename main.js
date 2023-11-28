@@ -11,11 +11,15 @@ export class Trigger {
     this.config = triggerConfig;
 
     (async () => {
-      this.api = await genCombine(
-        this.config.url + "/",
-        "public/manager.js",
-        genModule
-      );
+      try {
+        this.api = await genCombine(
+          this.config.url + "/",
+          "public/manager.js",
+          genModule
+        );
+      } catch {
+        console.log("Was unable to set up file trigger. This won't work!");
+      }
 
       this.html = await fs.readFile(this.folder + "index.html", "utf8");
       this.handler = await fs.readFile(this.folder + "handler.js", "utf8");
